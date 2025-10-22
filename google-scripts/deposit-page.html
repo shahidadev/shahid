@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deposit Page</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    
+    .welcome-text {
+      color: #666;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 18px;
+    }
+    
+    .user-info {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .user-info-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: white;
+      border-radius: 5px;
+    }
+    
+    .user-info-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .label {
+      font-weight: 600;
+      color: #555;
+    }
+    
+    .value {
+      color: #333;
+      word-break: break-all;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 600;
+    }
+    
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .error-message {
+      color: #e74c3c;
+      background: #ffe6e6;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .success-message {
+      color: #27ae60;
+      background: #e6ffe6;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .loading {
+      text-align: center;
+      color: #666;
+      padding: 20px;
+    }
+    
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>💰 Deposit</h1>
+    <p class="welcome-text">Welcome, <span id="displayUsername">Guest</span>!</p>
+    
+    <div id="errorMessage" class="error-message"></div>
+    <div id="successMessage" class="success-message"></div>
+    
+    <div id="loadingIndicator" class="loading" style="display: none;">
+      <div class="spinner"></div>
+      <p>Loading user details...</p>
+    </div>
+    
+    <div id="userInfoSection" style="display: none;">
+      <div class="user-info">
+        <div class="user-info-item">
+          <span class="label">Username:</span>
+          <span class="value" id="username">-</span>
+        </div>
+        <div class="user-info-item">
+          <span class="label">User ID:</span>
+          <span class="value" id="userId">-</span>
+        </div>
+        <div class="user-info-item">
+          <span class="label">Balance:</span>
+          <span class="value" id="balance">₹0</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="amount">Deposit Amount (₹)</label>
+        <input type="number" id="amount" min="1" step="1" placeholder="Enter amount" required>
+      </div>
+      
+      <button class="btn" id="payNowBtn" onclick="handlePayment()">Pay Now</button>
+    </div>
+  </div>
+  
+  <script>
+    // Configuration passed from backend
+    const SUPABASE_URL = '<?= supabaseUrl ?>';
+    const SERVICE_ROLE_KEY = '<?= serviceRoleKey ?>';
+    const URL_USERNAME = '<?= username ?>';
+    const URL_USER_ID = '<?= userId ?>';
+    
+    // Store user data
+    let userData = null;
+    
+    /**
+     * Initialize the page
+     */
+    async function initializePage() {
+      console.log('Initializing page...');
+      console.log('URL Username:', URL_USERNAME);
+      console.log('URL User ID:', URL_USER_ID);
+      
+      // Check if parameters are provided
+      if (!URL_USERNAME || !URL_USER_ID || URL_USERNAME === '' || URL_USER_ID === '') {
+        showError('Missing URL parameters. Please provide username and userId.');
+        return;
+      }
+      
+      // Show loading
+      document.getElementById('loadingIndicator').style.display = 'block';
+      
+      // Fetch user details from Supabase
+      try {
+        await fetchUserDetails(URL_USER_ID, URL_USERNAME);
+      } catch (error) {
+        console.error('Error initializing page:', error);
+        showError('Failed to initialize page: ' + error.message);
+      } finally {
+        document.getElementById('loadingIndicator').style.display = 'none';
+      }
+    }
+    
+    /**
+     * Fetch user details from Supabase
+     */
+    async function fetchUserDetails(userId, username) {
+      console.log('Fetching user details for:', userId);
+      
+      // Validate Supabase configuration
+      if (!SUPABASE_URL || !SERVICE_ROLE_KEY || 
+          SUPABASE_URL === 'YOUR_SUPABASE_URL' || 
+          SERVICE_ROLE_KEY === 'YOUR_SERVICE_ROLE_KEY') {
+        showError('Supabase is not configured properly. Please set your SUPABASE_URL and SERVICE_ROLE_KEY in the backend.');
+        return;
+      }
+      
+      try {
+        // Fetch from Supabase using the service role key
+        const url = `${SUPABASE_URL}/rest/v1/users?id=eq.${userId}`;
+        
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'apikey': SERVICE_ROLE_KEY,
+            'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const users = await response.json();
+        console.log('Fetched users:', users);
+        
+        if (users && users.length > 0) {
+          userData = users[0];
+          displayUserInfo(userData);
+        } else {
+          // If user not found in database, use URL parameters
+          console.log('User not found in database, using URL parameters');
+          userData = {
+            id: userId,
+            username: username,
+            balance: 0
+          };
+          displayUserInfo(userData);
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+        // Fallback to URL parameters on error
+        userData = {
+          id: userId,
+          username: username,
+          balance: 0
+        };
+        displayUserInfo(userData);
+        showError('Could not fetch user details from database. Using provided information.');
+      }
+    }
+    
+    /**
+     * Display user information on the page
+     */
+    function displayUserInfo(user) {
+      console.log('Displaying user info:', user);
+      
+      // Update display username
+      document.getElementById('displayUsername').textContent = user.username || 'Guest';
+      
+      // Update user info section
+      document.getElementById('username').textContent = user.username || '-';
+      document.getElementById('userId').textContent = user.id || '-';
+      document.getElementById('balance').textContent = `₹${user.balance || 0}`;
+      
+      // Show user info section
+      document.getElementById('userInfoSection').style.display = 'block';
+    }
+    
+    /**
+     * Handle payment button click
+     */
+    async function handlePayment() {
+      const amountInput = document.getElementById('amount');
+      const amount = parseFloat(amountInput.value);
+      
+      // Validate amount
+      if (!amount || amount <= 0) {
+        showError('Please enter a valid amount greater than 0');
+        return;
+      }
+      
+      // Disable button during processing
+      const payBtn = document.getElementById('payNowBtn');
+      payBtn.disabled = true;
+      payBtn.textContent = 'Processing...';
+      
+      try {
+        // Here you would normally integrate with a payment gateway
+        // For now, we'll simulate a successful payment
+        
+        console.log('Processing payment:', {
+          userId: userData.id,
+          username: userData.username,
+          amount: amount
+        });
+        
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Show success message
+        showSuccess(`Payment of ₹${amount} initiated successfully!`);
+        
+        // Update balance (in a real app, this would come from the backend)
+        const currentBalance = parseFloat(document.getElementById('balance').textContent.replace('₹', ''));
+        document.getElementById('balance').textContent = `₹${currentBalance + amount}`;
+        
+        // Clear amount input
+        amountInput.value = '';
+        
+      } catch (error) {
+        console.error('Payment error:', error);
+        showError('Payment failed: ' + error.message);
+      } finally {
+        // Re-enable button
+        payBtn.disabled = false;
+        payBtn.textContent = 'Pay Now';
+      }
+    }
+    
+    /**
+     * Show error message
+     */
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      
+      // Hide success message
+      document.getElementById('successMessage').style.display = 'none';
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+      }, 5000);
+    }
+    
+    /**
+     * Show success message
+     */
+    function showSuccess(message) {
+      const successDiv = document.getElementById('successMessage');
+      successDiv.textContent = message;
+      successDiv.style.display = 'block';
+      
+      // Hide error message
+      document.getElementById('errorMessage').style.display = 'none';
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        successDiv.style.display = 'none';
+      }, 5000);
+    }
+    
+    // Initialize page when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializePage);
+    } else {
+      initializePage();
+    }
+  </script>
+</body>
+</html>

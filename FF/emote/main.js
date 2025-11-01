@@ -6,6 +6,7 @@ let currentIndex = 0;
 const ITEMS_PER_LOAD = 20;
 let userUID = '';
 let activeRarity = 'ALL';
+let searchTimeout = null;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -55,6 +56,11 @@ function displayInitialEmotes() {
     displayedEmotes = [];
     document.getElementById('emotesGrid').innerHTML = '';
     loadMoreEmotes();
+    
+    // Force load visible images immediately after rendering
+    setTimeout(() => {
+        loadVisibleImages();
+    }, 100);
 }
 
 // Load more emotes (infinite scroll)
@@ -104,15 +110,39 @@ function createEmoteCard(emote) {
     return card;
 }
 
+// Load visible images immediately (fix for filter change issue)
+function loadVisibleImages() {
+    const images = document.querySelectorAll('img[data-src]');
+    images.forEach(img => {
+        const rect = img.getBoundingClientRect();
+        const isVisible = (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) + 200 &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+        
+        if (isVisible && img.dataset.src) {
+            img.src = img.dataset.src;
+            delete img.dataset.src;
+        }
+    });
+}
+
 // Lazy loading observer
 const imageObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             const img = entry.target;
-            img.src = img.dataset.src;
-            observer.unobserve(img);
+            if (img.dataset.src) {
+                img.src = img.dataset.src;
+                delete img.dataset.src;
+                observer.unobserve(img);
+            }
         }
     });
+}, {
+    rootMargin: '50px'
 });
 
 // Observe images for lazy loading
@@ -135,9 +165,20 @@ const scrollObserver = new IntersectionObserver((entries) => {
 
 // Setup event listeners
 function setupEventListeners() {
-    // Search functionality
+    // Advanced real-time search with multiple triggers
     const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', debounce(handleSearch, 300));
+    
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => handleAdvancedSearch(e), 150);
+    });
+    
+    searchInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            clearTimeout(searchTimeout);
+            handleAdvancedSearch(e);
+        }
+    });
 
     // Filter buttons
     const filterButtons = document.querySelectorAll('.filter-btn');
@@ -151,6 +192,9 @@ function setupEventListeners() {
 
     // Initial image observation
     observeImages();
+    
+    // Load visible images on scroll
+    window.addEventListener('scroll', debounce(loadVisibleImages, 100));
 }
 
 // Debounce function
@@ -166,28 +210,113 @@ function debounce(func, wait) {
     };
 }
 
-// Handle search
-function handleSearch(e) {
-    const searchTerm = e.target.value.toLowerCase().trim();
+// ADVANCED SEARCH FUNCTION - Searches in ALL JSON values
+function handleAdvancedSearch(e) {
+    const searchTerm = e.target.value.trim();
     
-    filteredEmotes = allEmotes.filter(emote => {
-        const matchesSearch = searchTerm === '' || 
-            emote.name.toLowerCase().includes(searchTerm) ||
-            emote.itemID.toString().includes(searchTerm) ||
-            emote.icon.toLowerCase().includes(searchTerm);
-        
-        const matchesRarity = activeRarity === 'ALL' || emote.Rare === activeRarity;
-        
-        return matchesSearch && matchesRarity;
+    console.log('🔍 Searching for:', searchTerm);
+    console.log('📊 Total emotes:', allEmotes.length);
+    
+    // If search term is empty, reset to current filter
+    if (searchTerm === '') {
+        filteredEmotes = allEmotes.filter(emote => {
+            return activeRarity === 'ALL' || emote.Rare === activeRarity;
+        });
+        console.log('✅ Reset - Showing:', filteredEmotes.length);
+        displayInitialEmotes();
+        observeImages();
+        return;
+    }
+    
+    // If search term exists, reset filter to ALL
+    activeRarity = 'ALL';
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
     });
-
+    document.querySelector('.filter-btn[data-rarity="ALL"]').classList.add('active');
+    
+    // Advanced search with scoring system
+    const searchLower = searchTerm.toLowerCase();
+    const searchResults = [];
+    
+    allEmotes.forEach(emote => {
+        let score = 0;
+        let matched = false;
+        
+        // Search in ALL fields and assign scores based on match quality
+        
+        // 1. Name search (highest priority)
+        if (emote.name && emote.name.toLowerCase().includes(searchLower)) {
+            matched = true;
+            if (emote.name.toLowerCase().startsWith(searchLower)) {
+                score += 100; // Exact start match
+            } else {
+                score += 50; // Contains match
+            }
+        }
+        
+        // 2. Item ID search (convert to string)
+        if (emote.itemID && emote.itemID.toString().includes(searchTerm)) {
+            matched = true;
+            if (emote.itemID.toString().startsWith(searchTerm)) {
+                score += 90; // Exact start match
+            } else {
+                score += 45; // Contains match
+            }
+        }
+        
+        // 3. Icon name search
+        if (emote.icon && emote.icon.toLowerCase().includes(searchLower)) {
+            matched = true;
+            if (emote.icon.toLowerCase().startsWith(searchLower)) {
+                score += 80; // Exact start match
+            } else {
+                score += 40; // Contains match
+            }
+        }
+        
+        // 4. Rarity search
+        if (emote.Rare && emote.Rare.toLowerCase().includes(searchLower)) {
+            matched = true;
+            score += 30;
+        }
+        
+        // 5. Type search
+        if (emote.type && emote.type.toLowerCase().includes(searchLower)) {
+            matched = true;
+            score += 20;
+        }
+        
+        // If any field matched, add to results with score
+        if (matched) {
+            searchResults.push({ emote, score });
+        }
+    });
+    
+    // Sort by score (highest first) - matched items appear at top
+    searchResults.sort((a, b) => b.score - a.score);
+    
+    // Extract sorted emotes
+    filteredEmotes = searchResults.map(result => result.emote);
+    
+    console.log('✅ Found:', filteredEmotes.length, 'results');
+    console.log('🎯 Top match:', filteredEmotes[0] ? filteredEmotes[0].name : 'None');
+    
+    // Display results
     displayInitialEmotes();
+    observeImages();
+    
+    // Scroll to top to show results
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Handle filter click
 function handleFilterClick(e) {
     const btn = e.target;
     const rarity = btn.dataset.rarity;
+    
+    // Clear search bar when filter is clicked
+    document.getElementById('searchInput').value = '';
 
     // Toggle active state
     if (btn.classList.contains('active')) {
@@ -204,20 +333,12 @@ function handleFilterClick(e) {
     }
 
     // Apply filter
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-    
     filteredEmotes = allEmotes.filter(emote => {
-        const matchesSearch = searchTerm === '' || 
-            emote.name.toLowerCase().includes(searchTerm) ||
-            emote.itemID.toString().includes(searchTerm) ||
-            emote.icon.toLowerCase().includes(searchTerm);
-        
-        const matchesRarity = activeRarity === 'ALL' || emote.Rare === activeRarity;
-        
-        return matchesSearch && matchesRarity;
+        return activeRarity === 'ALL' || emote.Rare === activeRarity;
     });
 
     displayInitialEmotes();
+    observeImages();
 }
 
 // Open item modal
@@ -229,6 +350,7 @@ function openItemModal(emote) {
     document.getElementById('modalIcon').onerror = function() {
         this.style.display = 'none';
     };
+    document.getElementById('modalIcon').style.display = 'block';
     document.getElementById('modalName').textContent = emote.name;
     document.getElementById('modalItemID').textContent = emote.itemID;
     document.getElementById('modalIconName').textContent = emote.icon;

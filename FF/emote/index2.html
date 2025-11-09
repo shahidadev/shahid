@@ -5,20 +5,19 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Redirecting...</title>
 
-  <!-- ✅ Change this to your destination URL -->
-  <meta http-equiv="refresh" content="0;url=https://example.com/">
-
   <style>
     html, body {
       height: 100%;
       margin: 0;
-      background: #0f0c29;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-direction: column;
       color: #fff;
       font-family: sans-serif;
     }
+
     .spinner {
       width: 60px;
       height: 60px;
@@ -27,9 +26,11 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
+
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+
     .text {
       margin-top: 12px;
       font-size: 14px;
@@ -42,8 +43,20 @@
   <div class="text">Redirecting…</div>
 
   <script>
-    // ✅ Instant JavaScript-based redirect (faster and more reliable)
-    window.location.replace("https://shahid.is-a.dev/ff/");
+    (function() {
+      // ✅ Apna base redirect URL yahan likho
+      const baseUrl = "https://shahid.is-a.dev/ff/";
+
+      // URL ke parameters aur hash nikal lo
+      const search = window.location.search || "";
+      const hash = window.location.hash || "";
+
+      // Final redirect URL banao
+      const finalUrl = baseUrl + search + hash;
+
+      // Instant redirect without adding history entry
+      window.location.replace(finalUrl);
+    })();
   </script>
 </body>
 </html>

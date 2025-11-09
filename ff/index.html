@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/png" href="/profile.png">
+  <title>FF Emote Bot</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      overflow: hidden;
+    }
+
+    #frame {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: 0;
+    }
+
+    /* Loader overlay */
+    #loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+
+    /* Spinner styles */
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <iframe id="frame" src="about:blank" allowfullscreen></iframe>
+
+  <script>
+    (function(){
+      'use strict';
+      const baseIframeUrl = 'https://3c39a750.freefiretcpbotsite.pages.dev/';
+      
+      function loadIframeWithAndClean() {
+        const iframe = document.getElementById('frame');
+        const loader = document.getElementById('loader');
+        const search = window.location.search || '';
+        const hash = window.location.hash || '';
+        const params = search + hash;
+        const finalIframeUrl = baseIframeUrl + (params ? params : '');
+        iframe.src = finalIframeUrl;
+
+        try {
+          const cleanPath = window.location.pathname; 
+          history.replaceState(null, '', cleanPath);
+        } catch (e) {
+          console.error('Could not clean URL via history.replaceState:', e);
+        }
+
+        iframe.addEventListener('load', function onLoad() {
+          loader.style.display = 'none';
+          iframe.removeEventListener('load', onLoad);
+        });
+
+        setTimeout(() => {
+          loader.style.display = 'none';
+        }, 5000);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadIframeWithAndClean);
+      } else {
+        loadIframeWithAndClean();
+      }
+    })();
+  </script>
+</body>
+</html>

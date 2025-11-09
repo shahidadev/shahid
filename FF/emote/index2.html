@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Redirecting...</title>
+
+  <!-- ✅ Change this to your destination URL -->
+  <meta http-equiv="refresh" content="0;url=https://example.com/">
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #0f0c29;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: sans-serif;
+    }
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .text {
+      margin-top: 12px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="spinner"></div>
+  <div class="text">Redirecting…</div>
+
+  <script>
+    // ✅ Instant JavaScript-based redirect (faster and more reliable)
+    window.location.replace("https://shahid.is-a.dev/ff/");
+  </script>
+</body>
+</html>

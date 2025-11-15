@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Redirecting...</title>
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: #fff;
+      font-family: sans-serif;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .text {
+      margin-top: 12px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="spinner"></div>
+  <div class="text">Redirecting…</div>
+
+  <script>
+    (function() {
+      // ✅ Apna base redirect URL yahan likho
+      const baseUrl = "https://ff.shahid.is-a.dev/";
+
+      // URL ke parameters aur hash nikal lo
+      const search = window.location.search || "";
+      const hash = window.location.hash || "";
+
+      // Final redirect URL banao
+      const finalUrl = baseUrl + search + hash;
+
+      // Instant redirect without adding history entry
+      window.location.replace(finalUrl);
+    })();
+  </script>
+</body>
+</html>

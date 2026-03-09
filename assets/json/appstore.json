@@ -1,0 +1,92 @@
+{
+  "button_logos": {
+    "web": "/assets/AppStore/buttons-logo/web.svg",
+    "android": "/assets/AppStore/buttons-logo/android.svg",
+    "android_tv": "/assets/AppStore/buttons-logo/tv.svg",
+    "telegram": "/assets/AppStore/buttons-logo/telegram.svg",
+    "github": "/assets/AppStore/buttons-logo/github.svg",
+    "download": "/assets/AppStore/buttons-logo/download.svg"
+  },
+  "open_source_apps": [
+    {
+      "name": "SimpMusic",
+      "description": "YouTube Music based player",
+      "logo": "/assets/AppStore/app-logo/SimpMusic.png",
+      "github": "https://github.com/maxrave-dev/SimpMusic/",
+      "download": "https://github.com/maxrave-dev/SimpMusic/releases/latest"
+    },
+    {
+      "name": "BtRemote",
+      "description": "Bluetooth remote control tool",
+      "logo": "/assets/AppStore/app-logo/BtRemote.png",
+      "github": "https://gitlab.com/Atharok/BtRemote/",
+      "download": "https://gitlab.com/Atharok/BtRemote/-/releases/"
+    },
+    {
+      "name": "LocalSend",
+      "description": "Local network file sharing",
+      "logo": "/assets/AppStore/app-logo/LocalSend.png",
+      "github": "https://github.com/localsend/localsend/",
+      "download": "https://github.com/localsend/localsend/releases/latest"
+    },
+    {
+      "name": "Droid-ify",
+      "description": "F-Droid app store client",
+      "logo": "/assets/AppStore/app-logo/Droid-ify.png",
+      "github": "https://github.com/Droid-ify/client/",
+      "download": "https://github.com/Droid-ify/client/releases/latest"
+    },
+    {
+      "name": "UpdateMe",
+      "description": "Track GitHub app updates",
+      "logo": "/assets/AppStore/app-logo/UpdateMe.png",
+      "github": "https://github.com/anfreire/updateMe-Mobile/",
+      "download": "https://github.com/anfreire/updateMe-Mobile/releases/latest"
+    }
+  ],
+  "most_used_apps": [
+    {
+      "name": "Vegamovies",
+      "description": "Movies download website",
+      "logo": "/assets/AppStore/app-logo/Vegamovies.png",
+      "web": [
+        "https://www.vglist.nl/",
+        "https://vglist.cv/" 
+      ],
+      "telegram": "https://vglist.nl/?re=telegram"
+    },
+    {
+      "name": "NetMirror",
+      "description": "Movies and TV streaming",
+      "logo": "/assets/AppStore/app-logo/NetMirror.webp",
+      "web": [
+        "https://netmirror.gg/",
+        "https://net22.cc/"
+      ],
+      "android_app": "/assets/AppStore/apks/NetMirrorAndroid.apk",
+      "android_tv_app": "/assets/AppStore/apks/NetMirrorTV.apk"
+    },
+    {
+      "name": "Cricfy TV",
+      "description": "Live cricket streaming app",
+      "logo": "/assets/AppStore/app-logo/CricyFyTV.png",
+      "telegram": "https://t.me/cricfytvapks",
+      "android_app": "/assets/AppStore/apks/CRICFy.apk"
+    },
+    {
+      "name": "PlayFy TV",
+      "description": "Live TV streaming app",
+      "logo": "/assets/AppStore/app-logo/playfy-tv-1.webp",
+      "web": "https://playfytvapp.com/",
+      "telegram": "https://t.me/+11QLYdHG5t45OGQ1",
+      "android_app": "/assets/AppStore/apks/PLAYFy.apk"
+    },
+    {
+      "name": "Poki",
+      "description": "Free browser games platform",
+      "logo": "/assets/AppStore/app-logo/poki.png",
+      "web": "https://poki.com/",
+      "android_app": "/assets/AppStore/apks/Poki.apk"
+    }
+  ]
+}

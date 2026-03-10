@@ -53,7 +53,8 @@
         "https://www.vglist.nl/",
         "https://vglist.cv/" 
       ],
-      "telegram": "https://vglist.nl/?re=telegram"
+      "telegram": "https://vglist.nl/?re=telegram" ,
+      "android_app": "/assets/AppStore/apks/VegaMovies_Official_v1.0.apk"
     },
     {
       "name": "NetMirror",

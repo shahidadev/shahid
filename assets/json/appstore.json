@@ -42,6 +42,13 @@
       "logo": "/assets/AppStore/app-logo/UpdateMe.png",
       "github": "https://github.com/anfreire/updateMe-Mobile/",
       "download": "https://github.com/anfreire/updateMe-Mobile/releases/latest"
+    },
+    {
+      "name": "KeepOn",
+      "description": "Keep your screen on smartly",
+      "logo": "/assets/AppStore/app-logo/KeepOn.png",
+      "github": "https://github.com/twentynine78/KeepOn/",
+      "download": "https://github.com/twentynine78/KeepOn/releases/latest"
     }
   ],
   "most_used_apps": [

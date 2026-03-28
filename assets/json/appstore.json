@@ -94,7 +94,7 @@
       "description": "Free browser games platform",
       "logo": "/assets/AppStore/app-logo/poki.png",
       "web": "https://poki.com/",
-      "android_app": "/assets/AppStore/apks/Poki.apk"
+      "android_app": "/assets/AppStore/apks/Poki.apk?v=11"
     }
   ]
 }

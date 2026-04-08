@@ -1,12 +1,4 @@
 {
-  "button_logos": {
-    "web": "/assets/AppStore/buttons-logo/web.svg",
-    "android": "/assets/AppStore/buttons-logo/android.svg",
-    "android_tv": "/assets/AppStore/buttons-logo/tv.svg",
-    "telegram": "/assets/AppStore/buttons-logo/telegram.svg",
-    "github": "/assets/AppStore/buttons-logo/github.svg",
-    "download": "/assets/AppStore/buttons-logo/download.svg"
-  },
   "open_source_apps": [
     {
       "name": "SimpMusic",

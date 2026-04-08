@@ -20,15 +20,15 @@
     download: "Download"
   };
 
-  const buttonLogoMap = {
-    web: "web",
-    android: "android",
-    android_tv: "android_tv",
-    android_app: "android",
-    android_tv_app: "android_tv",
-    telegram: "telegram",
-    github: "github",
-    download: "download"
+  const buttonIconMap = {
+    web: "bi-globe2",
+    android: "bi-android2",
+    android_tv: "bi-tv",
+    android_app: "bi-android2",
+    android_tv_app: "bi-tv",
+    telegram: "bi-telegram",
+    github: "bi-github",
+    download: "bi-download"
   };
 
   const gridNodes = Array.from(document.querySelectorAll("[data-app-grid]"));
@@ -69,7 +69,7 @@
     return Array.isArray(value) ? value : [value];
   };
 
-  const createButton = (type, url, logos) => {
+  const createButton = (type, url) => {
     const anchor = document.createElement("a");
     anchor.className = "app-btn";
     anchor.href = url;
@@ -77,14 +77,12 @@
     anchor.rel = "noopener noreferrer";
 
     const label = buttonLabelMap[type] || type;
-    const logoKey = buttonLogoMap[type] || type;
-    const logoSrc = logos && logos[logoKey] ? logos[logoKey] : "";
-
-    if (logoSrc) {
-      const img = document.createElement("img");
-      img.src = logoSrc;
-      img.alt = label + " logo";
-      anchor.appendChild(img);
+    const iconClass = buttonIconMap[type];
+    if (iconClass) {
+      const icon = document.createElement("i");
+      icon.className = "bi " + iconClass;
+      icon.setAttribute("aria-hidden", "true");
+      anchor.appendChild(icon);
     }
 
     const text = document.createElement("span");
@@ -94,7 +92,7 @@
     return anchor;
   };
 
-  const renderSection = (key, apps, logos) => {
+  const renderSection = (key, apps) => {
     const grid = gridNodes.find((node) => node.dataset.appGrid === key);
     if (!grid) {
       return;
@@ -150,7 +148,7 @@
         .forEach((keyName) => {
           const urls = normalizeLinks(app[keyName]);
           urls.forEach((url) => {
-            actions.appendChild(createButton(keyName, url, logos));
+            actions.appendChild(createButton(keyName, url));
           });
         });
 
@@ -164,9 +162,8 @@
     if (!data) {
       return;
     }
-    const logos = data.button_logos || {};
     Object.keys(sectionMap).forEach((key) => {
-      renderSection(sectionMap[key], data[key], logos);
+      renderSection(sectionMap[key], data[key]);
     });
   };
 
